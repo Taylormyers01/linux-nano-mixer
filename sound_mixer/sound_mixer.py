@@ -86,12 +86,6 @@ def get_channels():
 
     return channels
 
-def is_integer(val):
-    try:
-        int(val)
-        return True
-    except (ValueError, TypeError):
-        return False
     
 def map_sliders_to_channel_ids():
     channels = get_channels()
@@ -105,9 +99,7 @@ def map_sliders_to_channel_ids():
     return
 
 if __name__ == "__main__":
-    if not SINKS:
-        map_sliders_to_channel_ids()
-    print(SINKS)
+    main()
 
 
 '''
