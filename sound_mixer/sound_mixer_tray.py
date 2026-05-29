@@ -17,6 +17,8 @@ SLIDER_TO_SINK_NAME = {
     0: "Razer Audio Mixer Analog Stereo - mic"  # Razer Audio Mixer Analog Stereo (source) - > for mic volume
 }
 
+CURRENT_VOLUME = {}
+
 SINKS_TO_ID = None
 
 WPCTL_TYPES = ["Audio", "Devices", "Sinks", "Sources", "Filters", "Streams"]
@@ -35,22 +37,20 @@ class BackgroundWorker(QThread):
         if not SINKS:
             self.map_sliders_to_channel_ids()
         while True:
-
             try:    
                 line = ser.readline().decode().strip()
-
                 print(line)
-
+                
                 slider, value = line.split(':')
-
                 slider = int(slider)
                 value = int(value)
-
-                volume = round(value / 1023, 2)
+                volume = round(value / 1023, 2)       
 
                 if slider in SINKS:
-                    self.set_volume(SINKS[slider], volume)
-                    self.message_signal.emit(f"Slider {slider} -> {volume}")
+                    if slider not in CURRENT_VOLUME or (CURRENT_VOLUME[slider] > volume or CURRENT_VOLUME[slider] < volume):
+                        CURRENT_VOLUME[slider] = volume
+                        self.set_volume(SINKS[slider], volume)
+                        self.message_signal.emit(f"{SLIDER_TO_SINK_NAME[slider]} : {volume:.0%}")
 
             except Exception as e:
                 print(f"Error: {e}")
